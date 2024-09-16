@@ -1,10 +1,12 @@
 from .web_crawler_model import WebCrawlerModel
 
+
 class AppModel:
     def __init__(self):
         self._data = ""
         self._running = True
         self.web_crawler = WebCrawlerModel()
+       
 
     @property
     def data(self):
