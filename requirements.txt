@@ -1,0 +1,5 @@
+crewai
+python-dotenv
+langchain-openai
+langchain-anthropic
+langchain-community
