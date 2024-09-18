@@ -14,7 +14,7 @@ class WebCrawlerModel:
     def _create_web_crawl_agent(self):
         return Agent(
             role="Researcher",
-            goal="Find relevant sources like articles, blogs and research papers on the topic: {info}. Use DuckDuckGo to search for the most relevant articles, blogs, or sources.",
+            goal="Find relevant sources like articles, blogs and research papers on the topic: {info}.",
             backstory="""
                 You are a PhD research assistant at a prestigious university.
                 Your primary role involves conducting thorough searches for relevant academic articles, research papers, and scholarly works to support your advisor and research team. 
@@ -40,14 +40,14 @@ class WebCrawlerModel:
                 Keywords:"AI Agentic Systems"
                 query:"AI+Agentic+Systems"
                  
-                Then, search for articles related to "{info}" using "https://www.google.com". 
                 The articles should be the newest and most relevant based on the topic provided.
             """,
             expected_output="""
                 Provide exact title of the research papers and articles that are the most relevant to the topic provided.
                 Provide their summary as well.
-                Provide a list of only 10 most relevant articles and their summaries.
+                Provide a list of most relevant articles and their summaries.
                 Include the URLs of these articles.
+                List them from newest to oldest.
             """,
             tools=[self.url_tool],
             agent=self.web_crawl_agent

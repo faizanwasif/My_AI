@@ -1,27 +1,34 @@
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, ttk
 
 class AppView(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Web Crawler App")
+        self.geometry("800x600")  # Increased window size
         self._create_widgets()
 
     def _create_widgets(self):
-        self.label = tk.Label(self, text="Enter your search query:")
-        self.label.pack()
+        main_frame = ttk.Frame(self, padding="10")
+        main_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.entry = tk.Entry(self, width=50)
-        self.entry.pack()
+        self.label = ttk.Label(main_frame, text="Enter your search query:")
+        self.label.pack(pady=(0, 5))
 
-        self.submit_button = tk.Button(self, text="Search")
-        self.submit_button.pack()
+        self.entry = ttk.Entry(main_frame, width=80)  # Increased entry width
+        self.entry.pack(pady=(0, 10), fill=tk.X)
 
-        self.result_text = scrolledtext.ScrolledText(self, wrap=tk.WORD, width=60, height=20)
-        self.result_text.pack()
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X, pady=(0, 10))
 
-        self.quit_button = tk.Button(self, text="Quit")
-        self.quit_button.pack()
+        self.submit_button = ttk.Button(button_frame, text="Search")
+        self.submit_button.pack(side=tk.LEFT, padx=(0, 10))
+
+        self.quit_button = ttk.Button(button_frame, text="Quit")
+        self.quit_button.pack(side=tk.RIGHT)
+
+        self.result_text = scrolledtext.ScrolledText(main_frame, wrap=tk.WORD, width=80, height=30)  # Increased text area size
+        self.result_text.pack(fill=tk.BOTH, expand=True)
 
     def get_input(self):
         return self.entry.get()
