@@ -3,6 +3,8 @@ import urllib.request
 import feedparser
 from crewai_tools import tool
 from crewai_tools import BaseTool
+import config
+
 
 def get_search_tool():
     return DuckDuckGoSearchRun()
@@ -15,7 +17,7 @@ class URLTool(BaseTool):
          # Construct the arXiv API URL
          
         base_url = "http://export.arxiv.org/api/query?"
-        search_query = f"search_query=all:{query}&start={0}&max_results={10}"
+        search_query = f"search_query=all:{query}&start={0}&max_results={config.article_count}"
         url = base_url + search_query
         
         # Make the API request

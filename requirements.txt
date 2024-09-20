@@ -1,7 +1,6 @@
-crewai
-python-dotenv
-langchain-openai
-langchain-anthropic
-langchain-community
-feedparser
-crewai['tools']
+crewai==0.28.8
+crewai-tools==0.1.6
+feedparser==6.0.11
+langchain-anthropic==0.1.13
+langchain-community==0.0.38
+python-dotenv==1.0.0

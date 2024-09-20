@@ -2,6 +2,8 @@ from crewai import Agent, Task, Crew
 from langchain_anthropic import ChatAnthropic
 from src.utils.agent_tools import URLTool
 from langchain_openai import ChatOpenAI
+import config
+
 
 class WebCrawlerModel:
     def __init__(self):
@@ -21,7 +23,7 @@ class WebCrawlerModel:
                 You are responsible for gathering, analyzing, and synthesizing academic content, ensuring that the research is grounded in the latest studies and trends in your field. 
                 Your work is crucial in aiding the research team's direction and contributing to academic publications.
             """,
-            max_iter=20,
+            max_iter=10,
             tools=[self.url_tool],
             llm=self.model,
             allow_delegation=True,
@@ -33,19 +35,21 @@ class WebCrawlerModel:
             description="""
                 Extract key-words from {info}.
                
-                Search for URLs related to those keywords by adding a + symbol between all the keywords.
+                Search for URLs related to those keywords by "MUST" adding a + symbol between all the keywords.
                 
+                YOU MUST REFER TO THE EXAMPLE BELOW!!
+
                 Example:
                 Search query:"Search for AI Agentic Systems"
                 Keywords:"AI Agentic Systems"
-                query:"AI+Agentic+Systems"
+                query:"AI+Agentic+Systems" 
                  
                 The articles should be the newest and most relevant based on the topic provided.
             """,
-            expected_output="""
+            expected_output=f"""
+                List only {config.article_count} number of articles.
                 Provide exact title of the research papers and articles that are the most relevant to the topic provided.
-                Provide their summary as well.
-                Provide a list of most relevant articles and their summaries.
+                Provide their summary and published date as well.
                 Include the URLs of these articles.
                 List them from newest to oldest.
             """,
