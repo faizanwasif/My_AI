@@ -22,7 +22,7 @@ class AppController:
         self.app = QApplication(sys.argv)
         self.model = AppModel()
         self.view = AppView()
-
+        
         self.view.set_submit_command(self.submit)
         self.view.set_quit_command(self.quit)
 
@@ -31,8 +31,9 @@ class AppController:
         sys.exit(self.app.exec())
 
     def submit(self):
+        config.article_count = self.view.get_article_count() 
         user_input = self.view.get_input()
-        config.article_count = self.view.get_article_count()  # Update the global variable
+      
         self.view.clear_input()
         
         self.worker = WorkerThread(self.model, user_input)

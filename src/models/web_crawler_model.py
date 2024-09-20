@@ -35,23 +35,30 @@ class WebCrawlerModel:
             description="""
                 Extract key-words from {info}.
                
-                Search for URLs related to those keywords by "MUST" adding a + symbol between all the keywords.
+                Search for URLs related to those keywords newest ones only.
                 
                 YOU MUST REFER TO THE EXAMPLE BELOW!!
 
                 Example:
                 Search query:"Search for AI Agentic Systems"
                 Keywords:"AI Agentic Systems"
-                query:"AI+Agentic+Systems" 
+                query:"AI Agentic Systems" 
                  
-                The articles should be the newest and most relevant based on the topic provided.
+            
             """,
             expected_output=f"""
-                List only {config.article_count} number of articles.
-                Provide exact title of the research papers and articles that are the most relevant to the topic provided.
-                Provide their summary and published date as well.
-                Include the URLs of these articles.
+                
                 List them from newest to oldest.
+                The number of articles should ONLY be {config.article_count}
+                
+                Output "MUST" be structured like the following:
+                
+                Title: XYZ
+                Author: ABC
+                Published: YYYY-MM-DD
+                Summary: ABCXYZ
+                URL: http://arxiv.org/abs/2407.19438v1
+                
             """,
             tools=[self.url_tool],
             agent=self.web_crawl_agent

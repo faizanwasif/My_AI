@@ -15,9 +15,9 @@ class URLTool(BaseTool):
     
     def _run(self, query: str) -> list:
          # Construct the arXiv API URL
-         
+        result=query.replace(" ","+")
         base_url = "http://export.arxiv.org/api/query?"
-        search_query = f"search_query=all:{query}&start={0}&max_results={config.article_count}"
+        search_query = f"search_query=all:{result}&start={1}&max_results={config.article_count}&sortBy=relevance&sortOrder=descending"
         url = base_url + search_query
         
         # Make the API request

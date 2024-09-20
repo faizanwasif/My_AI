@@ -30,11 +30,11 @@ class AppView(QMainWindow):
         main_layout.addLayout(article_count_layout)
 
         button_layout = QHBoxLayout()
-        self.submit_button = QPushButton("Search")
-        button_layout.addWidget(self.submit_button)
-        button_layout.addStretch()
         self.quit_button = QPushButton("Quit")
         button_layout.addWidget(self.quit_button)
+        button_layout.addStretch()
+        self.submit_button = QPushButton("Search")
+        button_layout.addWidget(self.submit_button)
         main_layout.addLayout(button_layout)
 
         self.result_text = QTextEdit()
