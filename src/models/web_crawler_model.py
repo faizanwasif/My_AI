@@ -1,7 +1,6 @@
 from crewai import Agent, Task, Crew
 from langchain_anthropic import ChatAnthropic
 from src.utils.agent_tools import URLTool
-from langchain_openai import ChatOpenAI
 import config
 
 

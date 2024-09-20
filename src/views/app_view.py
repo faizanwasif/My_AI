@@ -1,7 +1,9 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit, QSpinBox
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 
 class AppView(QMainWindow):
+    update_article_count = pyqtSignal(int)  # New signal
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Web Crawler App")
@@ -25,16 +27,18 @@ class AppView(QMainWindow):
         self.article_count_input.setMinimum(1)
         self.article_count_input.setMaximum(100)
         self.article_count_input.setValue(10)  # Default value
+        self.update_count_button = QPushButton("Update")  # New button
         article_count_layout.addWidget(self.article_count_label)
         article_count_layout.addWidget(self.article_count_input)
+        article_count_layout.addWidget(self.update_count_button)
         main_layout.addLayout(article_count_layout)
 
         button_layout = QHBoxLayout()
-        self.quit_button = QPushButton("Quit")
-        button_layout.addWidget(self.quit_button)
-        button_layout.addStretch()
         self.submit_button = QPushButton("Search")
         button_layout.addWidget(self.submit_button)
+        button_layout.addStretch()
+        self.quit_button = QPushButton("Quit")
+        button_layout.addWidget(self.quit_button)
         main_layout.addLayout(button_layout)
 
         self.result_text = QTextEdit()
@@ -43,6 +47,9 @@ class AppView(QMainWindow):
 
         main_layout.setSpacing(10)
         main_layout.setContentsMargins(10, 10, 10, 10)
+
+        # Connect the new button to the update method
+        self.update_count_button.clicked.connect(self.update_article_count_value)
 
     def get_input(self):
         return self.entry.text()
@@ -62,6 +69,9 @@ class AppView(QMainWindow):
     def display_results(self, results):
         self.result_text.clear()
         self.result_text.setPlainText(results)
+
+    def update_article_count_value(self):
+        self.update_article_count.emit(self.get_article_count())
 
     def mainloop(self):
         self.show()

@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QThread, pyqtSignal
 from src.models.app_model import AppModel
 from src.views.app_view import AppView
-import config  # Import the config file
+import config
 
 class WorkerThread(QThread):
     result_ready = pyqtSignal(str)
@@ -22,18 +22,17 @@ class AppController:
         self.app = QApplication(sys.argv)
         self.model = AppModel()
         self.view = AppView()
-        
+
         self.view.set_submit_command(self.submit)
         self.view.set_quit_command(self.quit)
+        self.view.update_article_count.connect(self.update_article_count)  # Connect new signal
 
     def run(self):
         self.view.show()
         sys.exit(self.app.exec())
 
     def submit(self):
-        config.article_count = self.view.get_article_count() 
         user_input = self.view.get_input()
-      
         self.view.clear_input()
         
         self.worker = WorkerThread(self.model, user_input)
@@ -43,3 +42,11 @@ class AppController:
     def quit(self):
         self.model.stop()
         self.app.quit()
+
+    def update_article_count(self, count):
+        config.article_count = count
+        print(f"Article count updated to: {config.article_count}")  # For debugging
+
+if __name__ == "__main__":
+    controller = AppController()
+    controller.run()
