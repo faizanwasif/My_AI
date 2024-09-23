@@ -25,7 +25,7 @@ class AppController:
 
         self.view.set_submit_command(self.submit)
         self.view.set_quit_command(self.quit)
-        self.view.update_article_count.connect(self.update_article_count)  # Connect new signal
+        # self.view.update_article_count.connect(self.update_article_count)  # Connect new signal
 
     def run(self):
         self.view.show()

@@ -47,7 +47,6 @@ class WebCrawlerModel:
             """,
             expected_output=f"""
                 
-                List them from newest to oldest.
                 The number of articles should ONLY be {config.article_count}
                 
                 Output "MUST" be structured like the following:
@@ -57,6 +56,8 @@ class WebCrawlerModel:
                 Published: YYYY-MM-DD
                 Summary: ABCXYZ
                 URL: http://arxiv.org/abs/2407.19438v1
+
+                List from newest to oldest based on published date.
                 
             """,
             tools=[self.url_tool],

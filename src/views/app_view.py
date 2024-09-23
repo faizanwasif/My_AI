@@ -22,16 +22,16 @@ class AppView(QMainWindow):
         main_layout.addWidget(self.entry)
 
         article_count_layout = QHBoxLayout()
-        self.article_count_label = QLabel("Number of articles:")
+        # self.article_count_label = QLabel("Number of articles:")
         self.article_count_input = QSpinBox()
         self.article_count_input.setMinimum(1)
         self.article_count_input.setMaximum(100)
         self.article_count_input.setValue(10)  # Default value
-        self.update_count_button = QPushButton("Update")  # New button
-        article_count_layout.addWidget(self.article_count_label)
-        article_count_layout.addWidget(self.article_count_input)
-        article_count_layout.addWidget(self.update_count_button)
-        main_layout.addLayout(article_count_layout)
+        # self.update_count_button = QPushButton("Update")  # New button
+        # article_count_layout.addWidget(self.article_count_label)
+        # article_count_layout.addWidget(self.article_count_input)
+        # article_count_layout.addWidget(self.update_count_button)
+        # main_layout.addLayout(article_count_layout)
 
         button_layout = QHBoxLayout()
         self.submit_button = QPushButton("Search")
@@ -49,7 +49,7 @@ class AppView(QMainWindow):
         main_layout.setContentsMargins(10, 10, 10, 10)
 
         # Connect the new button to the update method
-        self.update_count_button.clicked.connect(self.update_article_count_value)
+        # self.update_count_button.clicked.connect(self.update_article_count_value)
 
     def get_input(self):
         return self.entry.text()
