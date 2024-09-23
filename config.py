@@ -1,2 +1,2 @@
 # Global variables
-article_count = 10 
+article_count = 10

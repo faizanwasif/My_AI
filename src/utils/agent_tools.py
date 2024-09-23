@@ -1,33 +1,42 @@
-from langchain_community.tools import DuckDuckGoSearchRun
 import urllib.request
+import json
 import feedparser
-from crewai_tools import tool
-from crewai_tools import BaseTool
 import config
+import requests
+from datetime import datetime
+from langchain.tools import BaseTool
 
+class ArticleExtractorTool(BaseTool):
+    name: str = "Combined Article Extractor Tool"
+    description: str = "This tool extracts articles from both arXiv and OpenAlex based on a search query."
 
-def get_search_tool():
-    return DuckDuckGoSearchRun()
-
-class URLTool(BaseTool):
-    name: str ="URL extractor tool"
-    description: str = ("This tool will return URLs")
-    
     def _run(self, query: str) -> list:
-         # Construct the arXiv API URL
-        result=query.replace(" ","+")
+        arxiv_results = self._fetch_arxiv_articles(query)
+        openalex_results = self._fetch_openalex_articles(query)
+        
+        # Combine results, alternating between sources
+        combined_results = []
+        for arxiv, openalex in zip(arxiv_results, openalex_results):
+            combined_results.append(arxiv)
+            combined_results.append(openalex)
+        
+        # Add any remaining results
+        combined_results.extend(arxiv_results[len(openalex_results):])
+        combined_results.extend(openalex_results[len(arxiv_results):])
+        
+        return combined_results[:config.article_count]  # Limit to the requested number of articles
+
+    def _fetch_arxiv_articles(self, query: str) -> list:
+        result = query.replace(" ", "+")
         base_url = "http://export.arxiv.org/api/query?"
-        search_query = f"search_query=all:{result}&start={1}&max_results={config.article_count}&sortOrder=descending"
+        search_query = f"search_query=all:{result}&start=0&max_results={config.article_count}&sortOrder=descending"
         url = base_url + search_query
         
-        # Make the API request
         with urllib.request.urlopen(url) as response:
             data = response.read().decode('utf-8')
         
-        # Parse the Atom feed
         feed = feedparser.parse(data)
         
-        # Extract and print the results
         results = []
         for entry in feed.entries:
             result = {
@@ -35,8 +44,37 @@ class URLTool(BaseTool):
                 'summary': entry.summary,
                 'published': entry.published,
                 'link': entry.link,
-                'author': entry.author
+                'author': entry.author,
+                'source': 'arXiv'
             }
             results.append(result)
         
         return results
+
+    def _fetch_openalex_articles(self, query: str) -> list:
+        base_url = "https://api.openalex.org/works"
+        current_year = datetime.now().year
+        params = {
+            'filter': f'title.search:{query},publication_year:2010-{current_year}',
+            'sort': 'publication_date:desc',
+            'per_page': config.article_count
+        }
+        
+        response = requests.get(base_url, params=params)
+        data = response.json()
+        
+        results = []
+        for work in data.get('results', []):
+            result = {
+                'title': work.get('title'),
+                'summary': work.get('abstract'),
+                'published': work.get('publication_date'),
+                'link': work.get('doi'),
+                'author': work.get('authorships', [{}])[0].get('author', {}).get('display_name', 'N/A'),
+                'source': 'OpenAlex'
+            }
+            results.append(result)
+        
+        return results
+
+    # isko hum baad may asynchronous

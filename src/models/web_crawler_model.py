@@ -1,12 +1,12 @@
 from crewai import Agent, Task, Crew
 from langchain_anthropic import ChatAnthropic
-from src.utils.agent_tools import URLTool
+from src.utils.agent_tools import ArticleExtractorTool
 import config
 
 
 class WebCrawlerModel:
     def __init__(self):
-        self.url_tool = URLTool()
+        self.url_tool = ArticleExtractorTool()
         self.model = ChatAnthropic(model='claude-3-haiku-20240307')
         self.web_crawl_agent = self._create_web_crawl_agent()
         self.crawling_task = self._create_crawling_task()
@@ -46,18 +46,16 @@ class WebCrawlerModel:
             
             """,
             expected_output=f"""
-                
-                The number of articles should ONLY be {config.article_count}
-                
+                                
                 Output "MUST" be structured like the following:
                 
                 Title: XYZ
                 Author: ABC
                 Published: YYYY-MM-DD
+                URL/Link: http://arxiv.org/abs/2407.19438v1
                 Summary: ABCXYZ
-                URL: http://arxiv.org/abs/2407.19438v1
+                
 
-                List from newest to oldest based on published date.
                 
             """,
             tools=[self.url_tool],
