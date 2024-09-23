@@ -4,4 +4,3 @@ feedparser==6.0.11
 langchain-anthropic==0.1.13
 langchain-community==0.0.38
 python-dotenv==1.0.0
-PyQt6==6.7.1
