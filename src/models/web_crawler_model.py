@@ -1,13 +1,16 @@
 from crewai import Agent, Task, Crew
 from langchain_anthropic import ChatAnthropic
-from src.utils.agent_tools import ArticleExtractorTool
+from src.utils.agent_tools import ArticleExtractorTool, get_search_tool
 import config
 
 
 class WebCrawlerModel:
     def __init__(self):
         self.url_tool = ArticleExtractorTool()
+        self.web_search = get_search_tool()
+        
         self.model = ChatAnthropic(model='claude-3-haiku-20240307')
+
         self.web_crawl_agent = self._create_web_crawl_agent()
         self.crawling_task = self._create_crawling_task()
         self.crew = self._create_crew()
@@ -42,7 +45,7 @@ class WebCrawlerModel:
                 Search query:"Search for AI Agentic Systems"
                 Keywords:"AI Agentic Systems"
                 query:"AI Agentic Systems" 
-                 
+        
             
             """,
             expected_output=f"""
@@ -52,10 +55,8 @@ class WebCrawlerModel:
                 Title: XYZ
                 Author: ABC
                 Published: YYYY-MM-DD
-                URL/Link: http://arxiv.org/abs/2407.19438v1
-                Summary: ABCXYZ
-                
-
+                URL/Link: http://hhhhjjjkkkklmnop
+                Summary: ABCXYZ                
                 
             """,
             tools=[self.url_tool],

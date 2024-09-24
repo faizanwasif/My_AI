@@ -6,6 +6,11 @@ import requests
 from datetime import datetime
 from langchain.tools import BaseTool
 
+from langchain_community.tools import DuckDuckGoSearchRun
+
+def get_search_tool():
+    return DuckDuckGoSearchRun()
+
 class ArticleExtractorTool(BaseTool):
     name: str = "Combined Article Extractor Tool"
     description: str = "This tool extracts articles from both arXiv and OpenAlex based on a search query."

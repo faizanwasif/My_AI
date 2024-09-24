@@ -5,3 +5,4 @@ langchain-anthropic==0.1.13
 langchain-community==0.0.38
 python-dotenv==1.0.0
 PyQt6==6.7.1
+duckduckgo-search==6.2.13
