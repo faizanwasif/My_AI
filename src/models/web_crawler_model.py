@@ -35,16 +35,27 @@ class WebCrawlerModel:
     def _create_crawling_task(self):
         return Task(
             description="""
-                Extract key-words from {info}.
-               
-                Search for URLs related to those keywords newest ones only.
-                
-                YOU MUST REFER TO THE EXAMPLE BELOW!!
 
+                
+                Instructions:
+
+                    Given the input {info}, perform the following steps:
+
+                    Correct any errors (e.g., spelling, grammar) in {info}.
+                    Extract the main keywords from the corrected input.
+                    Formulate a search query based on the keywords.
+                    Search for the newest URLs related to these keywords.
+                    Your output should follow this format:
+
+                    Search Query: "corrected input"
+                    Keywords: "extracted keywords"
+                    Query: "search query"
+                
                 Example:
-                Search query:"Search for AI Agentic Systems"
-                Keywords:"AI Agentic Systems"
-                query:"AI Agentic Systems" 
+
+                    Search Query: "Search for AI Agentic Systems"
+                    Keywords: "AI Agentic Systems"
+                    Query: "AI Agentic Systems"
         
             
             """,
