@@ -1,23 +1,25 @@
-import urllib.request
+import aiohttp
+import asyncio
 import json
 import feedparser
 import config
-import requests
 from datetime import datetime
 from langchain.tools import BaseTool
-
 from langchain_community.tools import DuckDuckGoSearchRun
 
 def get_search_tool():
     return DuckDuckGoSearchRun()
 
 class ArticleExtractorTool(BaseTool):
-    name: str = "Combined Article Extractor Tool"
-    description: str = "This tool extracts articles from both arXiv and OpenAlex based on a search query."
+    name: str = "Asynchronous Combined Article Extractor Tool"
+    description: str = "This tool asynchronously extracts articles from both arXiv and OpenAlex based on a search query."
 
-    def _run(self, query: str) -> list:
-        arxiv_results = self._fetch_arxiv_articles(query)
-        openalex_results = self._fetch_openalex_articles(query)
+    async def _arun(self, query: str) -> list:
+        async with aiohttp.ClientSession() as session:
+            arxiv_task = asyncio.create_task(self._fetch_arxiv_articles(session, query))
+            openalex_task = asyncio.create_task(self._fetch_openalex_articles(session, query))
+            
+            arxiv_results, openalex_results = await asyncio.gather(arxiv_task, openalex_task)
         
         # Combine results, alternating between sources
         combined_results = []
@@ -31,14 +33,14 @@ class ArticleExtractorTool(BaseTool):
         
         return combined_results[:config.article_count]  # Limit to the requested number of articles
 
-    def _fetch_arxiv_articles(self, query: str) -> list:
+    async def _fetch_arxiv_articles(self, session: aiohttp.ClientSession, query: str) -> list:
         result = query.replace(" ", "+")
         base_url = "http://export.arxiv.org/api/query?"
         search_query = f"search_query=all:{result}&start=0&max_results={config.article_count}&sortOrder=descending"
         url = base_url + search_query
         
-        with urllib.request.urlopen(url) as response:
-            data = response.read().decode('utf-8')
+        async with session.get(url) as response:
+            data = await response.text()
         
         feed = feedparser.parse(data)
         
@@ -56,7 +58,7 @@ class ArticleExtractorTool(BaseTool):
         
         return results
 
-    def _fetch_openalex_articles(self, query: str) -> list:
+    async def _fetch_openalex_articles(self, session: aiohttp.ClientSession, query: str) -> list:
         base_url = "https://api.openalex.org/works"
         current_year = datetime.now().year
         params = {
@@ -65,8 +67,8 @@ class ArticleExtractorTool(BaseTool):
             'per_page': config.article_count
         }
         
-        response = requests.get(base_url, params=params)
-        data = response.json()
+        async with session.get(base_url, params=params) as response:
+            data = await response.json()
         
         results = []
         for work in data.get('results', []):
@@ -82,4 +84,5 @@ class ArticleExtractorTool(BaseTool):
         
         return results
 
-    # isko hum baad may asynchronous
+    def _run(self, query: str) -> list:
+        return asyncio.run(self._arun(query))

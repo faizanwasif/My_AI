@@ -1,8 +1,8 @@
+import asyncio
 from crewai import Agent, Task, Crew
 from langchain_anthropic import ChatAnthropic
 from src.utils.agent_tools import ArticleExtractorTool, get_search_tool
 import config
-
 
 class WebCrawlerModel:
     def __init__(self):
@@ -14,7 +14,7 @@ class WebCrawlerModel:
         self.web_crawl_agent = self._create_web_crawl_agent()
         self.crawling_task = self._create_crawling_task()
         self.crew = self._create_crew()
- 
+
     def _create_web_crawl_agent(self):
         return Agent(
             role="Researcher",
@@ -31,12 +31,10 @@ class WebCrawlerModel:
             allow_delegation=True,
             verbose=True
         )
- 
+
     def _create_crawling_task(self):
         return Task(
             description="""
-
-                
                 Instructions:
 
                     Given the input {info}, perform the following steps:
@@ -56,11 +54,8 @@ class WebCrawlerModel:
                     Search Query: "Search for AI Agentic Systems"
                     Keywords: "AI Agentic Systems"
                     Query: "AI Agentic Systems"
-        
-            
             """,
             expected_output=f"""
-                                
                 Output "MUST" be structured like the following:
                 
                 Title: XYZ
@@ -68,19 +63,33 @@ class WebCrawlerModel:
                 Published: YYYY-MM-DD
                 URL/Link: http://hhhhjjjkkkklmnop
                 Summary: ABCXYZ                
-                
             """,
             tools=[self.url_tool],
             agent=self.web_crawl_agent
         )
-             
+
     def _create_crew(self):
         return Crew(
             agents=[self.web_crawl_agent],
             tasks=[self.crawling_task],
             verbose=True
         )
- 
-    def process_input(self, user_input):
+
+    async def process_input(self, user_input):
         domain_input = {"info": user_input}
-        return self.crew.kickoff(inputs=domain_input)
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self.crew.kickoff, domain_input)
+
+# Async initialization function
+async def create_web_crawler_model():
+    model = WebCrawlerModel()
+    return model
+
+# Usage example
+async def main():
+    model = await create_web_crawler_model()
+    result = await model.process_input("Your search query here")
+    print(result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
