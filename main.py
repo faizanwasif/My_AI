@@ -38,6 +38,7 @@ class WebCrawlerApp(QMainWindow):
         self.setWindowTitle("Web Crawler App")
         self.setGeometry(100, 100, 800, 600)
         self.threadpool = QThreadPool()
+        self.articles = []
         self.setup_ui()
         self.setup_web_crawler()
 
@@ -46,12 +47,18 @@ class WebCrawlerApp(QMainWindow):
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
 
+        # Search query layout
+        search_layout = QHBoxLayout()
         self.label = QLabel("Enter your search query:")
-        main_layout.addWidget(self.label)
-
+        search_layout.addWidget(self.label)
         self.entry = QLineEdit()
-        main_layout.addWidget(self.entry)
+        search_layout.addWidget(self.entry)
+        self.submit_button = QPushButton("Search")
+        self.submit_button.clicked.connect(self.submit)
+        search_layout.addWidget(self.submit_button)
+        main_layout.addLayout(search_layout)
 
+        # Article count layout
         article_count_layout = QHBoxLayout()
         self.article_count_label = QLabel("Number of articles:")
         self.article_count_input = QSpinBox()
@@ -60,18 +67,27 @@ class WebCrawlerApp(QMainWindow):
         self.article_count_input.setValue(10)  # Default value
         article_count_layout.addWidget(self.article_count_label)
         article_count_layout.addWidget(self.article_count_input)
+        article_count_layout.addStretch()
         main_layout.addLayout(article_count_layout)
 
-        button_layout = QHBoxLayout()
-        self.submit_button = QPushButton("Search")
-        self.submit_button.clicked.connect(self.submit)
-        button_layout.addWidget(self.submit_button)
-        button_layout.addStretch()
+        # Article search layout
+        article_search_layout = QHBoxLayout()
+        self.article_search_label = QLabel("Search within articles:")
+        article_search_layout.addWidget(self.article_search_label)
+        self.article_search_entry = QLineEdit()
+        self.article_search_entry.textChanged.connect(self.search_articles)
+        article_search_layout.addWidget(self.article_search_entry)
+        main_layout.addLayout(article_search_layout)
+
+        # Quit button layout
+        quit_layout = QHBoxLayout()
+        quit_layout.addStretch()
         self.quit_button = QPushButton("Quit")
         self.quit_button.clicked.connect(self.quit)
-        button_layout.addWidget(self.quit_button)
-        main_layout.addLayout(button_layout)
+        quit_layout.addWidget(self.quit_button)
+        main_layout.addLayout(quit_layout)
 
+        # Results display
         self.result_text = QTextBrowser()
         self.result_text.setOpenExternalLinks(True)  # Allow opening links in external browser
         main_layout.addWidget(self.result_text)
@@ -126,12 +142,19 @@ class WebCrawlerApp(QMainWindow):
         return await self.url_tool._arun(user_input)
 
     def display_results(self, results):
-        if not results:
+        self.articles = results
+        if not self.articles:
             self.result_text.setHtml("No results found. Please try a different search query.")
             return
 
+        self.search_articles()  # Display all articles initially
+
+    def search_articles(self):
+        search_query = self.article_search_entry.text().lower()
+        filtered_articles = [article for article in self.articles if self.article_matches_search(article, search_query)]
+
         html_content = "<html><body>"
-        for article in results:
+        for article in filtered_articles:
             html_content += f"<h3>{article.get('title', 'N/A')}</h3>"
             html_content += f"<p><strong>Author:</strong> {article.get('author', 'N/A')}</p>"
             html_content += f"<p><strong>Published:</strong> {article.get('published', 'N/A')}</p>"
@@ -151,6 +174,11 @@ class WebCrawlerApp(QMainWindow):
         
         # Scroll to the top
         self.result_text.moveCursor(QTextCursor.MoveOperation.Start)
+
+    def article_matches_search(self, article, search_query):
+        if not search_query:
+            return True
+        return any(search_query in str(value).lower() for value in article.values())
 
     def handle_error(self, error_message):
         print(f"Error occurred: {error_message}")

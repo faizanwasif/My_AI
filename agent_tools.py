@@ -96,7 +96,8 @@ class ArticleExtractorTool(BaseTool):
                     'source': 'OpenAlex'
                 }
                 results.append(result)
-            
+
+            print(f"OpenAlex Results: {data}")  # Debugging line
             return results
         except Exception as e:
             logger.error(f"Error fetching OpenAlex articles: {str(e)}")
