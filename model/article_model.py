@@ -1,9 +1,13 @@
 class ArticleModel:
+
     def __init__(self):
         self.articles = []
 
     def set_articles(self, articles):
         self.articles = articles
+        
+    def get_articles(self):
+        return self.articles
 
     def search_articles(self, search_query):
         if not search_query:

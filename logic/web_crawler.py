@@ -118,40 +118,33 @@ class WebCrawler:
         worker.signals.error.connect(error_callback)
         self.threadpool.start(worker)
 
-    def suggest_new_topic(self, user_input, success_callback, error_callback):
-        worker = AsyncWorker(self.process_input, user_input, is_article_search=False)
+    def suggest_new_topic(self, articles, success_callback, error_callback):
+   
+        worker = AsyncWorker(self.process_input, articles, is_article_search=False)
         worker.signals.result_ready.connect(success_callback)
         worker.signals.error.connect(error_callback)
         self.threadpool.start(worker)
 
-    async def process_input(self, user_input, is_article_search):
-        # First, use the web crawler to find articles
-        articles = await self.url_tool._arun(user_input)
-        self.handle_results(articles)
 
-        self.crew = Crew(
-            agents=[self.topic_suggester_agent],
-            tasks=[self.topic_suggester_task],
-            verbose=True
-        )
-
+    
+    async def process_input(self, input_data, is_article_search):
         if is_article_search:
+            # This case is for searching articles
+            articles = await self.url_tool._arun(input_data)
+            self.handle_results(articles)
             return articles
         else:
-            # Prepare a summary of the articles for the topic suggester
-            article_summaries = "\n".join([f"Title: {art['title']}" for art in articles])
-            print(f"Article Summaries: {article_summaries}")
             
-            # Use the topic suggester to generate new topics based on the article summaries
+            self.crew = Crew(
+                agents=[self.topic_suggester_agent],
+                tasks=[self.topic_suggester_task],
+                verbose=True
+            )
+            article_summaries = "\n".join([f"Title: {art['title']}" for art in input_data])
             result = self.crew.kickoff({"articles": article_summaries})
-
-            # Parse the JSON-formatted string into a Python list of dictionaries
             topics = json.loads(result)
-
-            # print(f"Result: {topics}")
-            # print(f"Result type: {type(topics)}")  # Should now be <class 'list'>
-
             return topics
+
 
     def handle_results(self, results):
         self.article_model.set_articles(results)

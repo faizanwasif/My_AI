@@ -86,8 +86,13 @@ class MainWindow(QMainWindow):
         user_input = self.entry.text()
         if not user_input:
             user_input = "recent trends in technology"  # Default input if the entry is empty
+        articles = self.article_model.get_articles()  # Get the articles from the model
+        if not articles:
+            self.result_text.setHtml("No articles available. Please search for articles first.")
+            return
         self.result_text.setHtml("Suggesting new topics... Please wait.")
-        self.web_crawler.suggest_new_topic(user_input, self.display_topic_suggestions, self.handle_error)
+        self.web_crawler.suggest_new_topic(articles, self.display_topic_suggestions, self.handle_error)
+
 
     def display_results(self, articles):
         if not articles:
