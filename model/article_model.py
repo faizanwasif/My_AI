@@ -12,3 +12,4 @@ class ArticleModel:
 
     def article_matches_search(self, article, search_query):
         return any(search_query in str(value).lower() for value in article.values())
+    

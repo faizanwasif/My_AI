@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QSpinBox
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QSpinBox # type: ignore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QTextCursor
 
@@ -48,6 +48,13 @@ class MainWindow(QMainWindow):
         article_search_layout.addWidget(self.article_search_entry)
         main_layout.addLayout(article_search_layout)
 
+        # New Article Generator Button
+        new_topic_suggester_layout = QHBoxLayout()
+        self.new_topic_suggester_button = QPushButton("Suggest New Topic")
+        self.new_topic_suggester_button.clicked.connect(self.suggest_new_topic)
+        new_topic_suggester_layout.addWidget(self.new_topic_suggester_button)
+        main_layout.addLayout(new_topic_suggester_layout)
+
         # Quit button layout
         quit_layout = QHBoxLayout()
         quit_layout.addStretch()
@@ -75,6 +82,13 @@ class MainWindow(QMainWindow):
         filtered_articles = self.article_model.search_articles(search_query)
         self.display_results(filtered_articles)
 
+    def suggest_new_topic(self):
+        user_input = self.entry.text()
+        if not user_input:
+            user_input = "recent trends in technology"  # Default input if the entry is empty
+        self.result_text.setHtml("Suggesting new topics... Please wait.")
+        self.web_crawler.suggest_new_topic(user_input, self.display_topic_suggestions, self.handle_error)
+
     def display_results(self, articles):
         if not articles:
             self.result_text.setHtml("No results found. Please try a different search query.")
@@ -101,6 +115,25 @@ class MainWindow(QMainWindow):
         
         # Scroll to the top
         self.result_text.moveCursor(QTextCursor.MoveOperation.Start)
+    
+
+    def display_topic_suggestions(self, topics):
+        html_content = "<html><body>"
+        html_content += "<h2>Suggested Research Topics:</h2>"
+
+        # Iterate over each topic in the list and add numbering, title, and description
+        for idx, topic in enumerate(topics, start=1):
+            html_content += f"<h3>{idx}. {topic['title']}</h3>"  # Display title as a heading
+            html_content += f"<p>{topic['description']}</p>"  # Display description in a paragraph
+            html_content += "<br>"  # Add space between topics for readability
+
+        html_content += "<hr>"
+        html_content += "</body></html>"
+
+        self.result_text.setHtml(html_content)
+        self.result_text.moveCursor(QTextCursor.MoveOperation.Start)
+
+
 
     def handle_error(self, error_message):
         print(f"Error occurred: {error_message}")
